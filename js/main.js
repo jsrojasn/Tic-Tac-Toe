@@ -71,67 +71,74 @@ let movements = 0
 //This is the mechanism of the game, it includes the hover effect that coincides the turn of
 //the players and every click the number of the box is append to the boxes selected of the player and is called
 //the checkwinner function
-boxes.forEach(box => {
-    box.addEventListener("mouseover", (e)=>{
-        if (player1.isTurn) {
+boxes.forEach((box,index) => {
+    
+    box.addEventListener("mouseover", (e) => {
+        if (player1.isTurn && !player2.boxesSelecteds.includes(index+1)) {
             e.target.style.backgroundImage = "url('img/o.svg')"
-        } else {
+        } else if (player2.isTurn && !player1.boxesSelecteds.includes(index+1)){
             e.target.style.backgroundImage = "url('img/x.svg')"
         }
+
     })
     box.addEventListener("mouseleave", (e) => e.target.style.backgroundImage = "" )
     box.addEventListener("click", ((e)=> {
-        //Change the label for the turns of the players
-        if (labelPlayer1.classList.contains("active")) {
-            labelPlayer1.classList.remove("active")
-        } else {
-            labelPlayer1.classList.add("active")
+        if (!player1.boxesSelecteds.includes(index+1) && !player2.boxesSelecteds.includes(index+1)) {
+            //Change the label for the turns of the players
+            if (labelPlayer1.classList.contains("active")) {
+                labelPlayer1.classList.remove("active")
+            } else {
+                labelPlayer1.classList.add("active")
+            }
+            if (labelPlayer2.classList.contains("active")) {
+                labelPlayer2.classList.remove("active")
+            } else {
+                labelPlayer2.classList.add("active")
+            }
+            
+            //Add one movement every click
+            movements += 1
+
+            //Mechanism of the game             
+            if (player1.isTurn && !player2.boxesSelecteds.includes(index+1)) {
+                e.target.classList.add("box-filled-1")
+                player1.isTurn = false
+                player2.isTurn = true        
+                player1.boxesSelecteds.push(Number(e.target.id))
+                checkWinner(player1.boxesSelecteds)
+                if (check===1) {
+                    board.style.display="none"
+                    finish.style.display=""
+                    finish.classList.add("screen-win-one")
+                    message.innerHTML="Winner"
+                }
+                if (movements===9 && check != 1) {
+                    board.style.display = "none"
+                    finish.style.display = ""
+                    finish.classList.add("screen-win-tie")
+                    message.innerHTML="It's a tie"
+                }
+            } else if (player2.isTurn && !player1.boxesSelecteds.includes(index + 1)) {
+                e.target.classList.add("box-filled-2")
+                player2.isTurn = false
+                player1.isTurn = true
+                player2.boxesSelecteds.push(Number(e.target.id))
+                checkWinner(player2.boxesSelecteds)
+                if (check===1){
+                    board.style.display = "none"
+                    finish.style.display = ""
+                    finish.classList.add("screen-win-two")
+                    message.innerHTML = "Winner"
+                }
+                if (movements === 9 && check != 1) {
+                    board.style.display = "none"
+                    finish.style.display = ""
+                    finish.classList.add("screen-win-tie")
+                    message.innerHTML="It's a tie"
+                }
+            }   
         }
-        if (labelPlayer2.classList.contains("active")) {
-            labelPlayer2.classList.remove("active")
-        } else {
-            labelPlayer2.classList.add("active")
-        }
-        //Add one movement every click
-        movements += 1
-        //Mechanism of the game
-        if (player1.isTurn) {
-            e.target.classList.add("box-filled-1")
-            player1.isTurn = false
-            player2.isTurn = true
-            player1.boxesSelecteds.push(Number(e.target.id))
-            checkWinner(player1.boxesSelecteds)
-            if (check===1) {
-                board.style.display="none"
-                finish.style.display=""
-                finish.classList.add("screen-win-one")
-                message.innerHTML="Winner"
-            }
-            if (movements===9 && check != 1) {
-                board.style.display = "none"
-                finish.style.display = ""
-                finish.classList.add("screen-win-tie")
-                message.innerHTML="It's a tie"
-            }
-        } else {
-            e.target.classList.add("box-filled-2")
-            player2.isTurn = false
-            player1.isTurn = true
-            player2.boxesSelecteds.push(Number(e.target.id))
-            checkWinner(player2.boxesSelecteds)
-            if (check===1){
-                board.style.display = "none"
-                finish.style.display = ""
-                finish.classList.add("screen-win-two")
-                message.innerHTML = "Winner"
-            }
-            if (movements === 9 && check != 1) {
-                board.style.display = "none"
-                finish.style.display = ""
-                finish.classList.add("screen-win-tie")
-                message.innerHTML="It's a tie"
-            }
-        }   
+
     }))
 });
 //When ther is a winner, the new game button reset the complete board and started a new game
